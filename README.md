@@ -90,3 +90,41 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
     </BrowserRouter>
   </React.StrictMode>
 ```
+
+
+## ルーティングのネスト(Nested Routes)
+```js
+//src/main.jsx
+
+//...
+  <React.StrictMode>
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<App />}>
+          <Route path='expenses' element={<Expenses />} />
+          <Route path='invoices' element={<Invoices />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  </React.StrictMode>
+```
+`<Route>`同士はネスト可能
+
+```js
+// src/App.js
+import { Link, Outlet } from 'react-router-dom';
+
+// ...
+  <nav
+    style={{
+      borderBottom: 'solid 1px',
+      paddingBottom: '1rem',
+    }}
+  >
+    <Link to='/invoices'>Invoices</Link> |{' '}
+    <Link to='/expenses'>Expenses</Link>
+  </nav>
+  <Outlet />
+```
+
+ネストの親コンポーネントに`<Outlet />`を入れるとその位置にネストの子コンポーネントが表示される
