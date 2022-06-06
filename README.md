@@ -292,3 +292,77 @@ export default function Invoice() {
   );
 }
 ```
+
+## fetchを使ったデータの取得と読み取り
+```js
+// invoices.jsx
+import { useState, useEffect } from 'react';
+
+export default function Invoices() {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      const users = await fetch(
+        'https://jsonplaceholder.typicode.com/users'
+      ).then((res) => res.json());
+      setUsers((prev) => users);
+    })();
+  }, []);
+  return (
+    <div style={{ display: 'flex' }}>
+      <nav
+        style={{
+          borderRight: 'solid 1px',
+          padding: '1rem',
+        }}
+      >
+        {users.map((user) => (
+          <Link
+            style={{ display: 'block', margin: '1rem 0' }}
+            to={`/invoices/${user.id}`}
+            key={user.id}
+          >
+            {user.name}
+          </Link>
+        ))}
+      </nav>
+      <Outlet />
+    </div>
+  );
+}
+```
+`useEffect()`を使用して、URLにアクセス -> fetchで取得(async) -> stateにセット という流れ
+
+第二引数に`[]`を指定することにより、URLにアクセスした初回のみ`useEffect()`に渡している関数の処理を走らせる
+
+```js
+// src/routes/invoice.jsx
+import { useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+
+export default function Invoice() {
+  const { invoiceId } = useParams();
+  const [user, setUser] = useState({});
+
+  useEffect(() => {
+    (async () => {
+      const u = await fetch(
+        `https://jsonplaceholder.typicode.com/users/${invoiceId}`
+      ).then((res) => res.json());
+      setUser((prev) => u);
+    })();
+  }, [invoiceId]);
+
+  return (
+    <main style={{ padding: '1rem' }}>
+      <h2>Username: {user.username}</h2>
+      <p>email: {user.email}</p>
+      <p>city: {user.address?.city}</p>
+      <p>website: {user.website}</p>
+    </main>
+  );
+}
+```
+
+`useEffect()`の第二引数に`invoiceId`を指定することにより、`invoiceId`に変更があった時のみ`useEffect()`を走らせる
