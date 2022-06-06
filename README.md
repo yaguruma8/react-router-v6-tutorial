@@ -175,3 +175,27 @@ export default function Invoices() {
   );
 }
 ```
+
+## "一致しない"ルーティングの追加(Adding a "No Match" Route)
+```js
+// src/main.js
+
+// ...
+  <Routes>
+    <Route path='/' element={<App />}>
+      <Route path='expenses' element={<Expenses />} />
+      <Route path='invoices' element={<Invoices />} />
+      <Route
+        path='*'
+        element={
+          <main style={{ padding: '1rem' }}>
+            <p>There's nothing here!</p>
+          </main>
+        }
+      />
+    </Route>
+  </Routes>
+```
+
+`path='*'`は「他のルートが一致しない場合のみ一致する」特別なパス指定
+
