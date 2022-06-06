@@ -71,3 +71,22 @@ export default function Expenses() {
 
 この時点ではURLは制御できるようになっているが表示はまだ
 
+## いくつかのルーティングを追加(Add Some Routes)
+```js
+// src/main.jsx
+import Expenses from './routes/expenses';
+import Invoices from './routes/invoices';
+
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+//...
+  <React.StrictMode>
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<App />} />
+        <Route path='expenses' element={<Expenses />} />
+        <Route path='invoices' element={<Invoices />} />
+      </Routes>
+    </BrowserRouter>
+  </React.StrictMode>
+```
