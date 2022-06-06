@@ -292,3 +292,40 @@ export default function Invoice() {
   );
 }
 ```
+
+## インデックスルート(Index Routes)
+```js
+// src/main.jsx
+
+// ...
+  <Routes>
+    <Route path='/' element={<App />}>
+      <Route path='expenses' element={<Expenses />} />
+      <Route path='invoices' element={<Invoices />}>
+        <Route
+          index
+          element={
+            <main style={{ padding: "1rem"}}>
+              <p>Select an invoice.</p>
+            </main>
+          }
+          >
+        </Route>
+        <Route path=':invoiceId' element={<Invoice />} />
+      </Route>
+      <Route
+        path='*'
+        element={
+          <main style={{ padding: '1rem' }}>
+            <p>There's nothing here!</p>
+          </main>
+        }
+      />
+    </Route>
+  </Routes>
+```
+
+インデックスルート`index`は親ルートに対するデフォルトのルートで、親ルートがマッチし、かつ子ルートがマッチしない時のみにマッチし、親ルートの`<Outret />`に描画される
+
+この場合はインデックスルートは`/invoices/`で、`/invoices/:invoiceId`にマッチしない場合のみマッチする
+
