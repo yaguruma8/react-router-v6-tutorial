@@ -130,6 +130,9 @@ import { Link, Outlet } from 'react-router-dom';
 ネストの親コンポーネントに`<Outlet />`を入れるとその位置にネストの子コンポーネントが表示される
 
 ## Invoicesのリスト(Listing the Invoices)
+
+### データの作成
+
 ```js
 // src/data.js
 const invoices = [
@@ -146,6 +149,9 @@ export function getInvoices() {
   return invoices;
 }
 ```
+
+### データの読み込み
+
 ```js
 // src/routes/invoices.jsx
 import { getInvoices } from '../data';
@@ -199,3 +205,90 @@ export default function Invoices() {
 
 `path='*'`は「他のルートが一致しない場合のみ一致する」特別なパス指定
 
+
+## URLパラメータを読む(Reading URL Params)
+
+### URLパラメータ用のルーティングを追加
+```js
+// src/main.js
+
+// ...
+  <Routes>
+    <Route path='/' element={<App />}>
+      <Route path='expenses' element={<Expenses />} />
+      <Route path='invoices' element={<Invoices />}>
+        <Route path=':invoiceId' element={<Invoice />} />
+      </Route>
+      <Route
+        path='*'
+        element={
+          <main style={{ padding: '1rem' }}>
+            <p>There's nothing here!</p>
+          </main>
+        }
+      />
+    </Route>
+```
+
+`path=':invoiceId'` でパスパラメータを指定する
+
+### Outretの追加
+```js
+// src/routes/invoices.jsx
+import { Link, Outlet } from 'react-router-dom';
+
+// ...
+    <div style={{ display: 'flex' }}>
+      <nav
+        style={{
+          borderRight: 'solid 1px',
+          padding: '1rem',
+        }}
+      >
+      {/* ... */}
+      </nav>
+      <Outlet />
+    </div>
+```
+
+### URLパラメータを`useParams()`フックで読み取る
+```js
+// src/routes/invoice.jsx
+import { useParams } from 'react-router-dom';
+
+export default function Invoice() {
+  const params = useParams();
+
+  return <h2>Invoice: {params.invoiceId}</h2>;
+}
+```
+
+`:invoiceId`を`useParams()`フックを用いて`params.invoiceId`として受け取る
+
+### データを受け取る
+```js
+// src/data.js
+
+// ...
+export function getInvoice(num) {
+  return invoices.find((invoice) => invoice.number === num);
+}
+```
+```js
+// src/routes/invoice.jsx
+import { getInvoice } from '../data';
+
+export default function Invoice() {
+  const params = useParams();
+  const invoice = getInvoice(parseInt(params.invoiceId, 10));
+  return (
+    <main style={{ padding: '1rem' }}>
+      <h2>Total Due: {invoice.amount}</h2>
+      <p>
+        {invoice.name} : {invoice.number}
+      </p>
+      <p>Due Date: {invoice.due}</p>
+    </main>
+  );
+}
+```
