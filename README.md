@@ -329,3 +329,44 @@ export default function Invoice() {
 
 この場合はインデックスルートは`/invoices/`で、`/invoices/:invoiceId`にマッチしない場合のみマッチする
 
+
+## アクティブリンク(Active Links)
+
+ナビゲーション用のリンク一覧の表示などで、現在のページへのリンクのスタイルを変更したい時に`Link`の代わりに`NavLink`を使って切り替えができる
+
+```js
+// src/routes/invoices.jsx
+import { NavLink, Outlet } from 'react-router-dom';
+
+// ...
+  {invoices.map((invoice) => (
+    <NavLink
+      style={({ isActive }) => {
+        return {
+          display: 'block',
+          margin: '1rem 0',
+          color: isActive ? 'red' : 'black',
+        };
+      }}
+      to={`/invoices/${invoice.number}`}
+      key={invoice.number}
+    >
+      {invoice.name}
+    </NavLink>
+  ))}
+```
+
+`<Link>`を`<NavLink>`に変更する
+
+`style`に渡すのをオブジェクト -> オブジェクトを返す関数（`isActive`の引数をとる）に変更する
+
+### クラスを使う場合
+
+`style`とほぼ同じ
+```js
+// Link
+<Link className={{ color: 'red'}} />
+
+// NavLink
+<NavLink className={({isActive}) => isActive ? 'activeClass' : 'NotActiveClass'} />
+```
