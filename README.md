@@ -128,3 +128,50 @@ import { Link, Outlet } from 'react-router-dom';
 ```
 
 ネストの親コンポーネントに`<Outlet />`を入れるとその位置にネストの子コンポーネントが表示される
+
+## Invoicesのリスト(Listing the Invoices)
+```js
+// src/data.js
+const invoices = [
+  {
+    name: "Santa Monica",
+    number: 1995,
+    amount: "$10,800",
+    due: "12/05/1995",
+  },
+  // ...
+];
+
+export function getInvoices() {
+  return invoices;
+}
+```
+```js
+// src/routes/invoices.jsx
+import { getInvoices } from '../data';
+
+export default function Invoices() {
+  const invoices = getInvoices();
+
+  return (
+    <div style={{ display: 'flex' }}>
+      <nav
+        style={{
+          borderRight: 'solid 1px',
+          padding: '1rem',
+        }}
+      >
+        {invoices.map((invoice) => (
+          <Link
+            style={{ display: 'block', margin: '1rem 0' }}
+            to={`/invoicces/${invoice.number}`}
+            key={invoice.number}
+          >
+            {invoice.name}
+          </Link>
+        ))}
+      </nav>
+    </div>
+  );
+}
+```
