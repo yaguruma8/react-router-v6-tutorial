@@ -1,9 +1,17 @@
 import { Link, Outlet } from 'react-router-dom';
-import { getInvoices } from '../data';
+import { useState, useEffect } from 'react';
 
 export default function Invoices() {
-  const invoices = getInvoices();
+  const [users, setUsers] = useState([]);
 
+  useEffect(() => {
+    (async () => {
+      const users = await fetch(
+        'https://jsonplaceholder.typicode.com/users'
+      ).then((res) => res.json());
+      setUsers((prev) => users);
+    })();
+  }, []);
   return (
     <div style={{ display: 'flex' }}>
       <nav
@@ -12,13 +20,13 @@ export default function Invoices() {
           padding: '1rem',
         }}
       >
-        {invoices.map((invoice) => (
+        {users.map((user) => (
           <Link
             style={{ display: 'block', margin: '1rem 0' }}
-            to={`/invoices/${invoice.number}`}
-            key={invoice.number}
+            to={`/invoices/${user.id}`}
+            key={user.id}
           >
-            {invoice.name}
+            {user.name}
           </Link>
         ))}
       </nav>

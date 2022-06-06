@@ -1,16 +1,25 @@
 import { useParams } from 'react-router-dom';
-import { getInvoice } from '../data';
+import { useState, useEffect } from 'react';
 
 export default function Invoice() {
-  const params = useParams();
-  const invoice = getInvoice(parseInt(params.invoiceId, 10));
+  const { invoiceId } = useParams();
+  const [user, setUser] = useState({});
+
+  useEffect(() => {
+    (async () => {
+      const u = await fetch(
+        `https://jsonplaceholder.typicode.com/users/${invoiceId}`
+      ).then((res) => res.json());
+      setUser((prev) => u);
+    })();
+  }, [invoiceId]);
+
   return (
     <main style={{ padding: '1rem' }}>
-      <h2>Total Due: {invoice.amount}</h2>
-      <p>
-        {invoice.name} : {invoice.number}
-      </p>
-      <p>Due Date: {invoice.due}</p>
+      <h2>Username: {user.username}</h2>
+      <p>email: {user.email}</p>
+      <p>city: {user.address?.city}</p>
+      <p>website: {user.website}</p>
     </main>
   );
 }
