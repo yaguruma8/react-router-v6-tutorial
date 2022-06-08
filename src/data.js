@@ -1,4 +1,4 @@
-const invoices = [
+let invoices = [
   {
     name: 'Santa Monica',
     number: 1995,

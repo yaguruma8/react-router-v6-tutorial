@@ -523,3 +523,54 @@ function BrandLink({ brand, ...props }) {
 リンクをクリックするたびに`isActive`が切り替わって、スタイルなし<->ありが切り替わる
 
 というカスタムコンポーネント
+
+## プログラムで制御するナビゲート(Navigating Programmatically)
+```js
+// src/data.js
+let invoices = {
+  // ...
+}
+// ...
+export function deleteInvoice(num) {
+  invoices = invoices.filter((invoice) => invoice.number !== num);
+}
+```
+`invoice`を削除できるようにする（再代入でデータを操作するので`const`から`let`に変更）
+
+```js
+// sec/routes/invoice.jsx
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { getInvoice, deleteInvoice } from '../data';
+
+export default function Invoice() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const params = useParams();
+  const invoice = getInvoice(parseInt(params.invoiceId, 10));
+  return (
+    <main style={{ padding: '1rem' }}>
+      <h2>Total Due: {invoice.amount}</h2>
+      <p>
+        {invoice.name} : {invoice.number}
+      </p>
+      <p>Due Date: {invoice.due}</p>
+      <p>
+        <button
+          onClick={() => {
+            deleteInvoice(invoice.number);
+            navigate('/invoices' + location.search);
+          }}
+        >
+          Delete
+        </button>
+      </p>
+    </main>
+  );
+}
+```
+deleteボタンをクリックで自分（のデータ）を削除`deleteInvoice()`
+
+インデックスルートに飛ばす`navigate()`
+- このとき、`location.search`でクエリパラメータがあれば保持する
+
+再レンダリングで削除される
