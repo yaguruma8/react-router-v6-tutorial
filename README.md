@@ -370,3 +370,71 @@ import { NavLink, Outlet } from 'react-router-dom';
 // NavLink
 <NavLink className={({isActive}) => isActive ? 'activeClass' : 'NotActiveClass'} />
 ```
+
+## クエリパラメータ(Search Params)
+
+`useSearchParams()`フックを使用する
+
+```js
+// src/routes/invoices.js
+import { NavLink, Outlet, useSearchParams } from 'react-router-dom';
+
+export default function Invoices() {
+  const invoices = getInvoices();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  return (
+    <div style={{ display: 'flex' }}>
+      <nav
+        style={{
+          borderRight: 'solid 1px',
+          padding: '1rem',
+        }}
+      >
+        <input
+          value={searchParams.get('filter') || ''}
+          onChange={(e) => {
+            const filter = e.target.value;
+            if (filter) {
+              setSearchParams({ filter });
+            } else {
+              setSearchParams({});
+            }
+          }}
+        />
+
+        {invoices
+          .filter((invoice) => {
+            const filter = searchParams.get('filter');
+            if (!filter) {
+              return true;
+            }
+            const name = invoice.name.toLowerCase();
+            return name.startsWith(filter.toLowerCase());
+          })
+          .map((invoice) => (
+            <NavLink
+              style={({ isActive }) => {
+                return {
+                  display: 'block',
+                  margin: '1rem 0',
+                  color: isActive ? 'red' : 'black',
+                };
+              }}
+              to={`/invoices/${invoice.number}`}
+              key={invoice.number}
+            >
+              {invoice.name}
+            </NavLink>
+          ))}
+      </nav>
+      <Outlet />
+    </div>
+  );
+}
+```
+`[searchParams, setSearchParams] = useSearchParams()`の形で用いる
+
+- `input`に入力があるとき（例では`onChange`で補足されている）、`setSearchParams('filter')`により`invoices?filter=hoge`のようにURLが再レンダリングされ、`searchParams`に値がセットされる
+- `invoices?filter=hoge`の値は`searchParams.get('filter')`で受け取る
+
