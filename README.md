@@ -376,7 +376,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 `useSearchParams()`フックを使用する
 
 ```js
-// src/routes/invoices.js
+// src/routes/invoices.jsx
 import { NavLink, Outlet, useSearchParams } from 'react-router-dom';
 
 export default function Invoices() {
@@ -437,4 +437,89 @@ export default function Invoices() {
 
 - `input`に入力があるとき（例では`onChange`で補足されている）、`setSearchParams('filter')`により`invoices?filter=hoge`のようにURLが再レンダリングされ、`searchParams`に値がセットされる
 - `invoices?filter=hoge`の値は`searchParams.get('filter')`で受け取る
+  - `searchParams`は`URLSearchParams`オブジェクト
+    - [URLSearchParams](https://developer.mozilla.org/ja/docs/Web/API/URLSearchParams)
 
+## カスタマイズ(Custom Befavior)
+
+上のやり方だとinputでフィルター -> フィルターされたリンクをクリック でフィルターがクリアされてしまう（URLのクエリパラメータが消えてしまう）
+
+残しておきたい場合、カスタムコンポーネントを作成する
+
+```js
+// src/routes/invoices.jsx
+import {
+  NavLink,
+  Outlet,
+  useSearchParams,
+  useLocation,
+} from 'react-router-dom';
+
+function QueryNavLink({ to, ...props }) {
+  const location = useLocation();
+  return <NavLink to={to + location.search} {...props} />;
+}
+
+export default function Invoices() {
+// ...
+    <QueryNavLink
+    style={({ isActive }) => {
+      return {
+        display: 'block',
+        margin: '1rem 0',
+        color: isActive ? 'red' : 'black',
+      };
+    }}
+    to={`/invoices/${invoice.number}`}
+    key={invoice.number}
+  >
+    {invoice.name}
+  </QueryNavLink>
+```
+`useLocation()`フックで現在のパスなどを取得できる
+```js
+// useLocation()で返ってくるオブジェクト
+{
+    "pathname": "/invoices",
+    "search": "?filter=s",
+    "hash": "",
+    "state": null,
+    "key": "0lk9eztu"
+}
+```
+`<NavLink to={to + location.search} {...props} />` で、クエリを付加したリンクが作成されて再レンダリングされる
+
+### カスタマイズ例
+
+```js
+function BrandLink({ brand, ...props }) {
+  // クエリパラメータを受け取る
+  let [params] = useSearchParams();
+  // クエリパラメータに?brand=<brand> が含まれているか調べる
+  let isActive = params.getAll("brand").includes(brand);
+  // 含まれていない場合
+  if (!isActive) {
+    // クエリパラメータに?brand=<brand>を追加
+    params.append("brand", brand);
+  } else {
+    // ?brand=<brand>を削除した新しいURLSearchParamsを作成
+    params = new URLSearchParams(
+      Array.from(params).filter(
+        ([key, value]) => key !== "brand" || value !== brand
+      )
+    );
+  }
+  return (
+    <Link
+      style={{ color: isActive ? "red" : "" }}
+      to={`/shoes?${params.toString()}`}
+      {...props}
+    />
+  );
+}
+```
+`?brand=<brand>`の全てのリンクにスタイルをつける
+
+リンクをクリックするたびに`isActive`が切り替わって、スタイルなし<->ありが切り替わる
+
+というカスタムコンポーネント
